@@ -1,0 +1,15 @@
+/**
+ * 
+ */
+package nz.co.dimu.message.common;
+
+/**
+ * @author huanghao
+ *
+ */
+public class ControlCodeDictionaries {
+	
+	public static final byte BOOT = Integer.valueOf("00", 16).byteValue();
+	
+	public static final byte SEND_CONFIRM_TEXT = Integer.valueOf("0E", 16).byteValue();
+}
