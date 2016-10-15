@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<controlCode>00</controlCode>
-	<messageClass>nz.co.dimu.message.entities.BootMessage</messageClass>
+	<packageName>nz.co.dimu.message.entities</packageName>
+	<className>BootMessage</className>
 	<fields>
 		<field>
 			<name>versionCode</name>

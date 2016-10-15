@@ -1,0 +1,127 @@
+package ${ packageName };
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import nz.co.dimu.message.common.AbstractMessage;
+import nz.co.dimu.message.common.FieldTypeMap;
+import nz.co.dimu.message.exceptions.PacketException;
+import nz.co.dimu.message.exceptions.ParseException;
+import nz.co.dimu.message.util.ByteConvertor;
+import nz.co.dimu.message.util.StringFormat;
+
+/**
+ * @author huanghao
+ *
+ */
+public class ${ className } extends AbstractMessage {
+	
+	private static Logger log = LoggerFactory.getLogger(${ className }.class);
+	
+// @generated fields start
+<#list fields as field>
+    private ${field.typeClass} ${field.name};
+</#list>
+// @generated fields end
+	
+	public ${ className }(String terminalNumber) {
+		// 设置终端号码
+		super.setTerminalNumber(terminalNumber);
+		// 设置控制字
+		super.setControlCode(Integer.valueOf("${ controlCode }", 16).byteValue());
+		// 设置数据域数组
+		super.dataFields = new String[]{
+			// @generated field names start
+			${ fieldNames }
+			// @generated field names end
+		};
+		// 设置数据域长度Map
+		super.dataFieldLength = new HashMap<String, Integer>();
+// @generated field length start
+<#list fieldLengths as fieldLength>
+		super.dataFieldLength.put("${fieldLength.name}", ${fieldLength.length});
+</#list>
+// @generated field length end
+		// 设置数据域类型Map
+		super.dataFieldType = new HashMap<String, String>();
+// @generated field type start
+<#list fieldTypes as fieldType>
+		super.dataFieldType.put("${fieldType.name}", "${fieldType.type}");
+</#list>
+// @generated field type end
+	}
+
+	/* (non-Javadoc)
+	 * @see nz.co.dimu.message.common.AbstractMessage#getDataProperties()
+	 */
+	@Override
+	protected byte[] getDataProperties() throws PacketException {
+		byte[] result = new byte[0];
+		// 循环数据域数组，按照顺序获取每一个类属性的值，并转换为byte数组合并到最终计算结果中
+		for (String fieldName : super.dataFields) {
+			String fieldNameCaps = StringUtils.capitalize(fieldName); 
+			try {
+				Method method = this.getClass().getMethod("get" + fieldNameCaps);
+				Object value = method.invoke(this);
+				if (value == null) {
+					log.error("java对象的属性值为null,属性名称：{}.", fieldName);
+					throw new PacketException(StringFormat.format("java对象的属性值为null,属性名称：{}.", fieldName));
+				}
+				byte[] fieldBytes = ByteConvertor.convertToByte(value, super.dataFieldType.get(fieldName));
+				result = ArrayUtils.addAll(result, fieldBytes);
+			} catch (Exception e) {
+				log.error("反射执行BootMessage类对象的get方法失败.", e);
+				throw new PacketException("反射执行${ className }类对象的get方法失败。", e);
+			}
+		}
+		
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see nz.co.dimu.message.common.AbstractMessage#setDataProperties(byte[])
+	 */
+	@Override
+	protected void setDataProperties(byte[] data) throws ParseException {
+		// TODO
+		// 参数data在MessageFactory中已经经过了校验，这里默认都是合法的
+		int index = 0;
+		for (String fieldName : super.dataFields) {
+			String fieldType = super.dataFieldType.get(fieldName);
+			Integer fieldLength = super.dataFieldLength.get(fieldName);
+			String fieldNameCaps = StringUtils.capitalize(fieldName);
+			try {
+				byte[] subData = ArrayUtils.subarray(data, index, index + fieldLength.intValue());
+				Object value = ByteConvertor.convertFromByte(subData, fieldType);
+				// 
+				if (value == null) {
+					log.error("数据域中的某个数据转换java属性时失败.属性名：{}.", fieldName);
+					throw new ParseException(StringFormat.format("数据域中的某个数据转换java属性时失败.属性名：{}.", fieldName));
+				}
+				Method method = this.getClass().getMethod("set" + fieldNameCaps, FieldTypeMap.data.get(fieldType));
+				method.invoke(this, value);
+			} catch (Exception e) {
+				log.error("反射执行BootMessage类对象的set方法失败.", e);
+				throw new ParseException("反射执行${ className }类对象的set方法失败。", e);
+			}
+		}
+	}
+	
+// @generated get/set methods start
+<#list fields as field>
+    public void set<@upperFC>${field.name}</@upperFC>(${field.typeClass} ${field.name}){
+        this.${field.name}=${field.name};
+    }
+
+    public ${field.typeClass} get<@upperFC>${field.name}</@upperFC>(){
+        return this.${field.name};
+    }
+
+</#list>
+// @generated get/set methods length end
+}

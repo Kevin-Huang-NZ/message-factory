@@ -4,6 +4,8 @@
 package nz.co.dimu.message;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +37,10 @@ public class MessageTypeMapper {
 	private MessageTypeMapper() {
 		mapper = new HashMap<String, String>();
 		SAXReader saxReader = new SAXReader();
+		InputStream fileStream = null;
         try {
-            Document document = saxReader.read(MessageTypeMapper.class.getClassLoader().getResourceAsStream(fileName));
+        	fileStream = MessageTypeMapper.class.getClassLoader().getResourceAsStream(fileName);
+            Document document = saxReader.read(fileStream);
             Element root = document.getRootElement();
             List<Node> messages = root.selectNodes("//message");
             for (Node message : messages) {
@@ -47,6 +51,14 @@ public class MessageTypeMapper {
             }
         } catch (DocumentException e) {
         	log.error("配置文件解析失败：{}", fileName, e);
+        } finally {
+        	if (fileStream != null) {
+        		try {
+					fileStream.close();
+				} catch (IOException e) {
+					log.error("关闭配置文件输入流时出现异常。文件名称：{}。", fileName, e);
+				}
+        	}
         }
 	}
 	
