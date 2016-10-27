@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nz.co.dimu.message;
+package nz.co.dimu.mf;
 
 import java.io.File;
 import java.io.IOException;

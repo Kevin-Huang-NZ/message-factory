@@ -19,10 +19,10 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nz.co.dimu.message.MessageTypeMapper;
 import nz.co.dimu.message.common.FieldTypeMap;
 import nz.co.dimu.message.generator.exceptions.InvalidXmlException;
 import nz.co.dimu.message.util.StringFormat;
+import nz.co.dimu.mf.MessageTypeMapper;
 
 /**
  * 读取、解析xml文件，并生成MessageMetaData对象。

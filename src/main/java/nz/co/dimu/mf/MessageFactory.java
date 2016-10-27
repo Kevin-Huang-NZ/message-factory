@@ -1,4 +1,4 @@
-package nz.co.dimu.message;
+package nz.co.dimu.mf;
 
 import java.lang.reflect.Constructor;
 import java.text.ParseException;

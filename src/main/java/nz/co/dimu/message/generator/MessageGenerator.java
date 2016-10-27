@@ -27,7 +27,14 @@ public class MessageGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MetaXmlReader metaXmlReader = new MetaXmlReader("meta/00-boot-message.xml");
+		if (args == null || args.length < 2) {
+			log.error("参数不正确，请传入报文类定义文件和生成java文件的输出路径。");
+			return;
+		}
+		String metaXml = "meta/" + args[0];
+		String outputFolder = args[1];
+		
+		MetaXmlReader metaXmlReader = new MetaXmlReader(metaXml);
 		MessageMetaData messageMetaData = metaXmlReader.createMetaMessage();
 
 		Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
@@ -45,7 +52,9 @@ public class MessageGenerator {
 			data.put("fieldLengths", messageMetaData.getFieldLength());
 			data.put("fieldTypes", messageMetaData.getFieldTypes());
 
-			fos = new FileOutputStream("D:/program/DIMU/message/src/main/test.java");
+			String outPutFileName = outputFolder + "/" + messageMetaData.getClassName() + ".java";
+			
+			fos = new FileOutputStream(outPutFileName);
 			template.process(data, new OutputStreamWriter(fos,"utf-8"));
 			
 		} catch (Exception e) {
